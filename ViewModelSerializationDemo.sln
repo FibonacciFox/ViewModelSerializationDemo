@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModelSerializationDemo", "ViewModelSerializationDemo\ViewModelSerializationDemo.csproj", "{B31245BC-E713-43B2-B683-5370BB68F37C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B31245BC-E713-43B2-B683-5370BB68F37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B31245BC-E713-43B2-B683-5370BB68F37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B31245BC-E713-43B2-B683-5370BB68F37C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B31245BC-E713-43B2-B683-5370BB68F37C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
