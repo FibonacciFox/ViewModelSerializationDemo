@@ -29,3 +29,4 @@ C:\Users\shama\OneDrive\Рабочий стол\ViewModelSerializationDemo\ViewM
 C:\Users\shama\OneDrive\Рабочий стол\ViewModelSerializationDemo\ViewModelSerializationDemo\ViewModelSerializationDemo\obj\Debug\net9.0\Avalonia\ViewModelSerializationDemo.dll
 C:\Users\shama\OneDrive\Рабочий стол\ViewModelSerializationDemo\ViewModelSerializationDemo\ViewModelSerializationDemo\obj\Debug\net9.0\Avalonia\ViewModelSerializationDemo.pdb
 C:\Users\shama\OneDrive\Рабочий стол\ViewModelSerializationDemo\ViewModelSerializationDemo\ViewModelSerializationDemo\obj\Debug\net9.0\refint\Avalonia\ViewModelSerializationDemo.dll
+C:\Users\shama\OneDrive\Рабочий стол\ViewModelSerializationDemo\ViewModelSerializationDemo\ViewModelSerializationDemo\obj\Debug\net9.0\ViewModelSerializationDemo.sourcelink.json

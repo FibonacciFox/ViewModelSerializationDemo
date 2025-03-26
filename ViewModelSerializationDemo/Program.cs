@@ -1,7 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-
-namespace ViewModelSerializationDemo
+﻿namespace ViewModelSerializationDemo
 {
     class Program
     {
@@ -19,10 +16,10 @@ namespace ViewModelSerializationDemo
         static void PrintLogicalTree(LogicalNode node, int indent)
         {
             string indentStr = new string(' ', indent);
-            Console.WriteLine($"{indentStr}{node.ElementType}");
+            Console.WriteLine($"{indentStr}Control: {node.ElementType}");
             foreach (var attr in node.Attributes)
             {
-                Console.WriteLine($"{indentStr}  {attr.Key} = {attr.Value}");
+                Console.WriteLine($"{indentStr}  Field:{attr.Key} = {attr.Value}");
             }
             if (node is TextNode textNode)
             {

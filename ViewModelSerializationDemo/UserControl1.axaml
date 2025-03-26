@@ -3,8 +3,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             FontFamily="$Default" 
              x:Class="ViewModelSerializationDemo.UserControl1">
-    <Button Classes="h1" Foreground="Linen" Name="Button1" HorizontalAlignment="Center">
-        
-    </Button>
+    <Grid Name="Grid1" ColumnDefinitions="Auto" IsVisible="False">
+        <StackPanel Grid.Column="0"  Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button Name="ButtonStart" Content="Start ManagedTask"/>
+                <Button Name="ButtonPauseResume" Content="Pause ManagedTask"/>
+            </StackPanel>
+            <TextBlock Name="Textblock1" Text="$x value: 0"/>
+            <Image Width="128" Height="128"  Name="Image1"/>
+        </StackPanel>
+    </Grid>
 </UserControl>
