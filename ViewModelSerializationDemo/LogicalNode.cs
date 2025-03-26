@@ -1,3 +1,5 @@
+using ViewModelSerializationDemo.Models.Properties;
+
 namespace ViewModelSerializationDemo
 {
     /// <summary>
@@ -9,11 +11,26 @@ namespace ViewModelSerializationDemo
         /// Тип элемента (например, "StackPanel", "Button" и т.д.).
         /// </summary>
         public string? ElementType { get; set; }
+        
+        /// <summary>
+        /// Коллекция узлов-свойств для styled свойств.
+        /// </summary>
+        public List<StyledPropertyNode> StyledProperties { get; set; } = new List<StyledPropertyNode>();
 
         /// <summary>
-        /// Атрибуты элемента (например, Margin, Width и т.п.).
+        /// Коллекция узлов-свойств для attached свойств.
         /// </summary>
-        public Dictionary<string, string> Attributes { get; set; } = new Dictionary<string, string>();
+        public List<AttachedPropertyNode> AttachedProperties { get; set; } = new List<AttachedPropertyNode>();
+
+        /// <summary>
+        /// Коллекция узлов-свойств для direct свойств.
+        /// </summary>
+        public List<DirectPropertyNode> DirectProperties { get; set; } = new List<DirectPropertyNode>();
+
+        /// <summary>
+        /// Коллекция узлов-свойств для CLR свойств.
+        /// </summary>
+        public List<ClrPropertyNode> ClrProperties { get; set; } = new List<ClrPropertyNode>();
 
         /// <summary>
         /// Дочерние узлы, если элемент является контейнером.

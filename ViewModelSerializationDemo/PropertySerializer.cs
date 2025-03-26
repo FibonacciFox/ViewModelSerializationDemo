@@ -1,137 +1,66 @@
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using ViewModelSerializationDemo.Models.Properties;
 
-namespace ViewModelSerializationDemo;
-
-/// <summary>
-/// Класс для сериализации свойств контрола в набор атрибутов,
-/// включая styled, attached и direct свойства.
-/// </summary>
-public static class PropertySerializer
+namespace ViewModelSerializationDemo
 {
-    /// <summary>
-    /// Сериализует styled, attached и direct свойства контрола в словарь.
-    /// </summary>
-    public static Dictionary<string, string> SerializeProperties(Control control)
+    public static class PropertySerializer
     {
-        Dictionary<string, string> attributes = new Dictionary<string, string>();
-
-        // Обработка styled-свойств (используем control.IsSet(prop))
-        var styledProperties = AvaloniaPropertyRegistry.Instance.GetRegistered(control.GetType());
-        foreach (var prop in styledProperties)
+        public static void SerializeProperties(Control control, LogicalNode node)
         {
-            // Пропускаем свойство "Content" для ContentControl, чтобы избежать дублирования.
-            if (control is ContentControl && prop.Name == "Content")
-                continue;
+            // Множество для отслеживания имен свойств, которые уже сериализованы через AvaloniaPropertyRegistry.
+            var addedPropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // Пропускаем только для чтения
-            if (prop.IsReadOnly)
-                continue;
-
-            if (control.IsSet(prop))
+            // Сериализация styled-свойств.
+            var styledProperties = AvaloniaPropertyRegistry.Instance.GetRegistered(control.GetType());
+            foreach (var prop in styledProperties)
             {
-                var value = control.GetValue(prop);
-                if (value != null)
+                var styledNode = StyledPropertyNode.From(prop, control);
+                if (styledNode != null)
                 {
-                    attributes[prop.Name] = value.ToString()!;
+                    node.StyledProperties.Add(styledNode);
+                    addedPropertyNames.Add(prop.Name);
                 }
             }
-        }
 
-        // Обработка attached-свойств
-        var attachedProperties = AvaloniaPropertyRegistry.Instance.GetRegisteredAttached(control.GetType());
-        foreach (var prop in attachedProperties)
-        {
-            // Пропускаем свойство "NameScope.NameScope".
-            if (prop.Name == "NameScope")
-                continue;
-            
-            if (prop.IsReadOnly)
-                continue;
-
-            if (control.IsSet(prop))
+            // Сериализация attached-свойств.
+            var attachedProperties = AvaloniaPropertyRegistry.Instance.GetRegisteredAttached(control.GetType());
+            foreach (var prop in attachedProperties)
             {
-                var value = control.GetValue(prop);
-                if (value != null)
+                var attachedNode = AttachedPropertyNode.From(prop, control);
+                if (attachedNode != null)
                 {
-                    string attrName = $"{prop.OwnerType.Name}.{prop.Name}";
-                    attributes[attrName] = value.ToString()!;
+                    node.AttachedProperties.Add(attachedNode);
+                    // Обычно для attached-свойств имя CLR не совпадает,
+                    // поэтому здесь не добавляем в addedPropertyNames.
                 }
             }
-        }
 
-        // Обработка direct-свойств
-        var directProperties = AvaloniaPropertyRegistry.Instance.GetRegisteredDirect(control.GetType());
-        foreach (var prop in directProperties)
-        {
-            if (prop.IsReadOnly)
-                continue;
-
-            var value = control.GetValue(prop);
-            if (value != null)
+            // Сериализация direct-свойств.
+            var directProperties = AvaloniaPropertyRegistry.Instance.GetRegisteredDirect(control.GetType());
+            foreach (var prop in directProperties)
             {
-                attributes[prop.Name] = value.ToString()!;
-            }
-        }
-        
-        // Обработка CLR-свойств через рефлексию
-        var clrProperties = control.GetType()
-            .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
-            .Where(prop => prop.CanRead &&
-                           prop.GetIndexParameters().Length == 0 && // исключаем индексаторы
-                           prop.GetMethod?.IsPublic == true &&       // обязательный публичный getter
-                           prop.SetMethod?.IsPublic == true &&       // обязательный публичный setter
-                           !attributes.ContainsKey(prop.Name));       // исключаем уже обработанные свойства
-
-        foreach (var prop in clrProperties)
-        {
-            try
-            {
-                var value = prop.GetValue(control);
-                if (value != null)
+                var directNode = DirectPropertyNode.From(prop, control);
+                if (directNode != null)
                 {
-                    // Если значение является простым (число, строка, bool и т.п.), просто сериализуем его.
-                    if (IsSimpleValue(value))
-                    {
-                        attributes[prop.Name] = value.ToString()!;
-                    }
-                    else
-                    {
-                        // Если тип свойства не является простым, но содержит статический метод Parse(string),
-                        // считаем, что его строковое представление достаточно для сериализации.
-                        var type = value.GetType();
-                        var parseMethod = type.GetMethod("Parse", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, new[] { typeof(string) }, null);
-                        if (parseMethod != null)
-                        {
-                            attributes[prop.Name] = value.ToString()!;
-                        }
-                    }
+                    node.DirectProperties.Add(directNode);
+                    addedPropertyNames.Add(prop.Name);
                 }
             }
-            catch
+
+            // Сериализация CLR-свойств.
+            var clrProperties = control.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var prop in clrProperties)
             {
-                // При необходимости можно логировать ошибки получения значения.
+                // Если имя свойства уже добавлено через styled или direct, пропускаем его.
+                if (addedPropertyNames.Contains(prop.Name))
+                    continue;
+
+                var clrNode = ClrPropertyNode.From(prop, control);
+                if (clrNode != null)
+                    node.ClrProperties.Add(clrNode);
             }
         }
-
-
-
-        return attributes;
-    }
-
-
-
-    /// <summary>
-    /// Проверяет, является ли значение простым для сериализации (числовой тип, строка, булево, перечисление и т.п.).
-    /// </summary>
-    private static bool IsSimpleValue(object value)
-    {
-        var type = value.GetType();
-        return type.IsPrimitive ||
-               type.IsEnum ||
-               value is string ||
-               value is double ||
-               value is float ||
-               value is decimal;
     }
 }

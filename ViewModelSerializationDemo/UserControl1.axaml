@@ -4,15 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              FontFamily="$Default" 
+             Background="Gold"
              x:Class="ViewModelSerializationDemo.UserControl1">
-    <Grid Name="Grid1" ColumnDefinitions="Auto" IsVisible="False">
-        <StackPanel Grid.Column="0"  Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button Name="ButtonStart" Content="Start ManagedTask"/>
-                <Button Name="ButtonPauseResume" Content="Pause ManagedTask"/>
-            </StackPanel>
-            <TextBlock Name="Textblock1" Text="$x value: 0"/>
-            <Image Width="128" Height="128"  Name="Image1"/>
-        </StackPanel>
-    </Grid>
+    <Canvas Background="AliceBlue" Margin="20">
+        <Rectangle Fill="Red" Height="100" Width="100" Margin="10"/>
+        <Rectangle Fill="Blue" Height="100" Width="100" Opacity="0.5"
+                   Canvas.Left="50" Canvas.Top="20"/>
+        <Rectangle Fill="Green" Height="100" Width="100" 
+                   Canvas.Left="60" Margin="40" Canvas.Top="40"/>
+        <Rectangle Fill="Orange" Height="100" Width="100" 
+                   Canvas.Right="70" Canvas.Bottom="60"/>
+    </Canvas>
 </UserControl>
