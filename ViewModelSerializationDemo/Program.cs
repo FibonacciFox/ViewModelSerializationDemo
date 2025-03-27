@@ -8,7 +8,7 @@
             LogicalNode logicalTree = LogicalTreeBuilder.BuildLogicalTree(new UserControl1());
 
             // Выводим логическое дерево в консоль для проверки.
-            PrintLogicalTree(logicalTree, 0);
+            //  PrintLogicalTree(logicalTree, 0);
         }
 
         // Рекурсивный метод для вывода структуры логического дерева в консоль.

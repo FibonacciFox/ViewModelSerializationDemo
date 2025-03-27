@@ -5,9 +5,17 @@ namespace ViewModelSerializationDemo.Models.Properties;
 /// </summary>
 public abstract class PropertyNode
 {
+    /// <summary>
+    /// Имя свойства.
+    /// </summary>
     public string Name { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Строковое представление значения свойства.
+    /// Используется для простых значений.
+    /// </summary>
+    public string? Value { get; set; }
+    
     protected static bool IsSimpleValue(object value)
     {
         var type = value.GetType();
