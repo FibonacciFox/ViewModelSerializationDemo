@@ -5,13 +5,15 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              FontFamily="$Default" 
              Background="Gold"
+             Name="UserControl2"
              x:Class="ViewModelSerializationDemo.UserControl1">
     
-    <Rectangle Fill="Aqua" Height="200" Width="400"
+    <Rectangle Name="Rectangle1" Fill="Aqua" Height="200" Width="400"
+               RenderedGeometry=""
                ToolTip.Placement="Bottom">
         <ToolTip.Tip>
             <StackPanel>
-                <TextBlock Classes="h1" FontSize="16">Rectangle</TextBlock>
+                <TextBlock Classes="h1, BR" FontSize="16">Rectangle</TextBlock>
                 <TextBlock>Some explanation here.</TextBlock>
             </StackPanel>
         </ToolTip.Tip>
