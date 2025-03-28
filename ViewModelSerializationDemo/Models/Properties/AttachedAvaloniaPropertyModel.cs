@@ -7,7 +7,7 @@ namespace ViewModelSerializationDemo.Models.Properties
     /// <summary>
     /// Узел для attached-свойств.
     /// </summary>
-    public class AttachedPropertyNode : PropertyNode
+    public class AttachedAvaloniaPropertyModel : AvaloniaPropertyModel
     {
         /// <summary>
         /// Если значение свойства является сложным объектом (например, Control),
@@ -15,7 +15,7 @@ namespace ViewModelSerializationDemo.Models.Properties
         /// </summary>
         public LogicalNode? SerializedValue { get; set; }
 
-        public static AttachedPropertyNode? From(AvaloniaProperty property, Control control)
+        public static AttachedAvaloniaPropertyModel? From(AvaloniaProperty property, Control control)
         {
             // Пропускаем нежелательные свойства.
             if (property.Name == "NameScope")
@@ -29,7 +29,7 @@ namespace ViewModelSerializationDemo.Models.Properties
             if (value == null)
                 return null;
 
-            var node = new AttachedPropertyNode
+            var node = new AttachedAvaloniaPropertyModel
             {
                 Name = $"{property.OwnerType.Name}.{property.Name}"
             };

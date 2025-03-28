@@ -15,22 +15,22 @@ namespace ViewModelSerializationDemo
         /// <summary>
         /// Коллекция узлов-свойств для styled свойств.
         /// </summary>
-        public List<StyledPropertyNode> StyledProperties { get; set; } = new List<StyledPropertyNode>();
+        public List<StyledAvaloniaPropertyModel> StyledProperties { get; set; } = new List<StyledAvaloniaPropertyModel>();
 
         /// <summary>
         /// Коллекция узлов-свойств для attached свойств.
         /// </summary>
-        public List<AttachedPropertyNode> AttachedProperties { get; set; } = new List<AttachedPropertyNode>();
+        public List<AttachedAvaloniaPropertyModel> AttachedProperties { get; set; } = new List<AttachedAvaloniaPropertyModel>();
 
         /// <summary>
         /// Коллекция узлов-свойств для direct свойств.
         /// </summary>
-        public List<DirectPropertyNode> DirectProperties { get; set; } = new List<DirectPropertyNode>();
+        public List<DirectAvaloniaPropertyModel> DirectProperties { get; set; } = new List<DirectAvaloniaPropertyModel>();
 
         /// <summary>
         /// Коллекция узлов-свойств для CLR свойств.
         /// </summary>
-        public List<ClrPropertyNode> ClrProperties { get; set; } = new List<ClrPropertyNode>();
+        public List<ClrAvaloniaPropertyModel> ClrProperties { get; set; } = new List<ClrAvaloniaPropertyModel>();
 
         /// <summary>
         /// Дочерние узлы, если элемент является контейнером.

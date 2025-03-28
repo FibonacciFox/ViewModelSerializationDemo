@@ -6,9 +6,9 @@ namespace ViewModelSerializationDemo.Models.Properties;
 /// <summary>
 /// Узел для direct-свойств.
 /// </summary>
-public class DirectPropertyNode : PropertyNode
+public class DirectAvaloniaPropertyModel : AvaloniaPropertyModel
 {
-    public static DirectPropertyNode? From(AvaloniaProperty property, Control control)
+    public static DirectAvaloniaPropertyModel? From(AvaloniaProperty property, Control control)
     {
         if (property.IsReadOnly)
             return null;
@@ -17,7 +17,7 @@ public class DirectPropertyNode : PropertyNode
         if (value == null)
             return null;
 
-        return new DirectPropertyNode
+        return new DirectAvaloniaPropertyModel
         {
             Name = property.Name,
             Value = value.ToString()!

@@ -16,7 +16,7 @@ namespace ViewModelSerializationDemo
             var styledProperties = AvaloniaPropertyRegistry.Instance.GetRegistered(control.GetType());
             foreach (var prop in styledProperties)
             {
-                var styledNode = StyledPropertyNode.From(prop, control);
+                var styledNode = StyledAvaloniaPropertyModel.From(prop, control);
                 if (styledNode != null)
                 {
                     node.StyledProperties.Add(styledNode);
@@ -28,7 +28,7 @@ namespace ViewModelSerializationDemo
             var attachedProperties = AvaloniaPropertyRegistry.Instance.GetRegisteredAttached(control.GetType());
             foreach (var prop in attachedProperties)
             {
-                var attachedNode = AttachedPropertyNode.From(prop, control);
+                var attachedNode = AttachedAvaloniaPropertyModel.From(prop, control);
                 if (attachedNode != null)
                 {
                     node.AttachedProperties.Add(attachedNode);
@@ -41,7 +41,7 @@ namespace ViewModelSerializationDemo
             var directProperties = AvaloniaPropertyRegistry.Instance.GetRegisteredDirect(control.GetType());
             foreach (var prop in directProperties)
             {
-                var directNode = DirectPropertyNode.From(prop, control);
+                var directNode = DirectAvaloniaPropertyModel.From(prop, control);
                 if (directNode != null)
                 {
                     node.DirectProperties.Add(directNode);
@@ -57,7 +57,7 @@ namespace ViewModelSerializationDemo
                 if (addedPropertyNames.Contains(prop.Name))
                     continue;
 
-                var clrNode = ClrPropertyNode.From(prop, control);
+                var clrNode = ClrAvaloniaPropertyModel.From(prop, control);
                 if (clrNode != null)
                     node.ClrProperties.Add(clrNode);
             }

@@ -9,11 +9,11 @@
              x:Class="ViewModelSerializationDemo.UserControl1">
     
     <Rectangle Name="Rectangle1" Fill="Aqua" Height="200" Width="400"
-               RenderedGeometry=""
+               Classes="Test,h1"
                ToolTip.Placement="Bottom">
         <ToolTip.Tip>
             <StackPanel>
-                <TextBlock Classes="h1, BR" FontSize="16">Rectangle</TextBlock>
+                <TextBlock Name="TextBlockH1" Classes="h1,h2,h3" FontSize="16">Rectangle</TextBlock>
                 <TextBlock>Some explanation here.</TextBlock>
             </StackPanel>
         </ToolTip.Tip>

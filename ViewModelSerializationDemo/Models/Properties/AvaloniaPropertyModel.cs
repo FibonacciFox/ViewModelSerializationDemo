@@ -3,7 +3,7 @@ namespace ViewModelSerializationDemo.Models.Properties;
 /// <summary>
 /// Базовый класс для сериализованного свойства.
 /// </summary>
-public abstract class PropertyNode
+public abstract class AvaloniaPropertyModel
 {
     /// <summary>
     /// Имя свойства.
