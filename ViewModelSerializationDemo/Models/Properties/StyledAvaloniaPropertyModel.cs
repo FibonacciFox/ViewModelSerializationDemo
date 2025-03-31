@@ -1,5 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.LogicalTree;
+using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo.Models.Properties;
 
@@ -10,12 +12,9 @@ public class StyledAvaloniaPropertyModel : AvaloniaPropertyModel
 {
     public static StyledAvaloniaPropertyModel? From(AvaloniaProperty property, Control control)
     {
-        // Пропускаем "Content" для ContentControl и только для чтения свойства.
-        if (control is ContentControl && property.Name == "Content")
-            return null;
-        if (property.IsReadOnly)
-            return null;
-        if (!control.IsSet(property))
+        if ((control is ContentControl && property.Name == "Content") ||
+            property.IsReadOnly ||
+            !control.IsSet(property))
             return null;
 
         var value = control.GetValue(property);
@@ -25,7 +24,10 @@ public class StyledAvaloniaPropertyModel : AvaloniaPropertyModel
         return new StyledAvaloniaPropertyModel
         {
             Name = property.Name,
-            Value = value.ToString()!
+            Value = PropertySerializationHelper.SerializeValue(value),
+            ValueKind = PropertySerializationHelper.ResolveValueKind(value)
         };
     }
+
+    
 }

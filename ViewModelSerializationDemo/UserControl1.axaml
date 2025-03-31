@@ -6,6 +6,7 @@
              FontFamily="$Default" 
              Background="Gold"
              Name="UserControl2"
+             Foreground="Aqua"
              x:Class="ViewModelSerializationDemo.UserControl1">
     
     <Rectangle Name="Rectangle1" Fill="Aqua" Height="200" Width="400"

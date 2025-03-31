@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ViewModelSerializationDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05b9d8bf7d188ea8507ba7b9cb80469a66cc4096")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31e4c433b440bd7a4549838de2ce84b9a4a1e731")]
 [assembly: System.Reflection.AssemblyProductAttribute("ViewModelSerializationDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ViewModelSerializationDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

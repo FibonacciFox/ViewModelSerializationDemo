@@ -1,4 +1,6 @@
-﻿namespace ViewModelSerializationDemo
+﻿using ViewModelSerializationDemo.Models.Properties;
+
+namespace ViewModelSerializationDemo
 {
     class Program
     {
@@ -13,45 +15,75 @@
 
         // Рекурсивный метод для вывода структуры логического дерева в консоль.
         static void PrintLogicalTree(LogicalNode node, int indent)
+{
+    string indentStr = new string(' ', indent);
+
+    // 🔷 Контрол
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine($"{indentStr}Control: {node.ElementType}");
+    Console.ResetColor();
+
+    // Метод для цветного вывода свойства
+    void PrintProperty(AvaloniaPropertyModel prop, string category)
+    {
+        // Выбор цвета по типу свойства
+        ConsoleColor color = category switch
         {
-            string indentStr = new string(' ', indent);
-            Console.WriteLine($"{indentStr}Control: {node.ElementType}");
+            "StyledProperty" => ConsoleColor.Yellow,
+            "AttachedProperty" => ConsoleColor.Magenta,
+            "DirectProperty" => ConsoleColor.Green,
+            "ClrProperty" => ConsoleColor.Blue,
+            _ => ConsoleColor.White
+        };
 
-            // Вывод styled-свойств.
-            foreach (var prop in node.StyledProperties)
-            {
-                Console.WriteLine($"{indentStr}  StyledProperty: {prop.Name} = {prop.Value}");
-            }
+        Console.ForegroundColor = color;
+        Console.Write($"{indentStr}  {category}: ");
+        Console.ResetColor();
 
-            // Вывод attached-свойств.
-            foreach (var prop in node.AttachedProperties)
-            {
-                Console.WriteLine($"{indentStr}  AttachedProperty: {prop.Name} = {prop.Value}");
-            }
+        Console.Write($"{prop.Name} = {prop.Value} ");
 
-            // Вывод direct-свойств.
-            foreach (var prop in node.DirectProperties)
-            {
-                Console.WriteLine($"{indentStr}  DirectProperty: {prop.Name} = {prop.Value}");
-            }
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.Write($"(Kind: {prop.ValueKind}");
 
-            // Вывод CLR-свойств.
-            foreach (var prop in node.ClrProperties)
-            {
-                Console.WriteLine($"{indentStr}  ClrProperty: {prop.Name} = {prop.Value}");
-            }
-
-            // Если узел является TextNode, выводим его текст.
-            if (node is TextNode textNode)
-            {
-                Console.WriteLine($"{indentStr}  Text: {textNode.Text}");
-            }
-
-            // Рекурсивный вывод для дочерних узлов.
-            foreach (var child in node.Children)
-            {
-                PrintLogicalTree(child, indent + 2);
-            }
+        if (prop.IsContainsControl)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(", ContainsControl: true");
         }
+
+        Console.ResetColor();
+        Console.WriteLine(")");
+    }
+
+    // Styled
+    foreach (var prop in node.StyledProperties)
+        PrintProperty(prop, "StyledProperty");
+
+    // Attached
+    foreach (var prop in node.AttachedProperties)
+        PrintProperty(prop, "AttachedProperty");
+
+    // Direct
+    foreach (var prop in node.DirectProperties)
+        PrintProperty(prop, "DirectProperty");
+
+    // CLR
+    foreach (var prop in node.ClrProperties)
+        PrintProperty(prop, "ClrProperty");
+
+    // Text node
+    if (node is TextNode textNode)
+    {
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.WriteLine($"{indentStr}  Text: {textNode.Text}");
+        Console.ResetColor();
+    }
+
+    // Дочерние узлы
+    foreach (var child in node.Children)
+        PrintLogicalTree(child, indent + 2);
+}
+
+
     }
 }

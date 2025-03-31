@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo.Models.Properties;
 
@@ -20,7 +21,9 @@ public class DirectAvaloniaPropertyModel : AvaloniaPropertyModel
         return new DirectAvaloniaPropertyModel
         {
             Name = property.Name,
-            Value = value.ToString()!
+            Value = PropertySerializationHelper.SerializeValue(value),
+            ValueKind = PropertySerializationHelper.ResolveValueKind(value)
         };
     }
+
 }
