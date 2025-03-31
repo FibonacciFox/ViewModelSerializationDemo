@@ -39,6 +39,11 @@ public enum AvaloniaPropertyValueKind
     /// Значение является ссылкой на ресурс (StaticResource, DynamicResource).
     /// </summary>
     Resource,
+    
+    /// <summary>
+    /// Значение является кистью (Background, BorderBrush, Foreground, ...).
+    /// </summary>
+    Brush,
 
     /// <summary>
     /// Неопределённый или нестандартный тип.

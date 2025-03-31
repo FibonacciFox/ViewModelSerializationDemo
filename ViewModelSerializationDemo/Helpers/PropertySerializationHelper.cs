@@ -21,7 +21,15 @@ public static class PropertySerializationHelper
     };
 
     /// <summary>
-    /// Проверяет, можно ли сериализовать CLR-свойство в axaml.
+    /// Проверяет, является ли свойство runtime-only (неподходящее для сериализации).
+    /// </summary>
+    public static bool IsRuntimeProperty(PropertyInfo prop)
+    {
+        return RuntimeOnlyProperties.Contains(prop.Name);
+    }
+
+    /// <summary>
+    /// Проверяет, можно ли сериализовать CLR-свойство в XAML.
     /// </summary>
     public static bool IsXamlSerializableClrProperty(PropertyInfo prop, Control control)
     {
@@ -31,7 +39,7 @@ public static class PropertySerializationHelper
         if (prop.GetIndexParameters().Length > 0)
             return false;
 
-        // Пропускаем зарегистрированные AvaloniaProperty
+        // Пропускаем свойства, зарегистрированные как AvaloniaProperty
         var fieldName = prop.Name + "Property";
         var fieldInfo = control.GetType().GetField(fieldName,
             BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
@@ -50,54 +58,31 @@ public static class PropertySerializationHelper
     }
 
     /// <summary>
-    /// Преобразует значение свойства в сериализуемую строку.
+    /// Преобразует значение свойства в строку для XAML или отладки.
     /// </summary>
     public static string SerializeValue(object value)
     {
-        switch (value)
+        return value switch
         {
-            case string s:
-                return s;
-
-            case bool b:
-                return b.ToString().ToLowerInvariant();
-
-            case double d:
-                return d.ToString("G", CultureInfo.InvariantCulture);
-
-            case float f:
-                return f.ToString("G", CultureInfo.InvariantCulture);
-
-            case decimal m:
-                return m.ToString("G", CultureInfo.InvariantCulture);
-
-            case Enum e:
-                return e.ToString();
-
-            case AvaloniaList<string> list:
-                return string.Join(",", list);
-
-            case IBrush brush:
-                return brush.ToString() ?? "Unknown";
-
-            case IBinding binding:
-                return SerializeBinding(binding);
-
-            case IResourceProvider:
-                return "DynamicResource";
-            
-            default:
-                var type = value.GetType();
-
-                if (type.IsValueType)
-                    return value.ToString() ?? string.Empty;
-
-                return value.ToString() ?? string.Empty;
-        }
+            string s => s,
+            bool b => b.ToString().ToLowerInvariant(),
+            double d => d.ToString("G", CultureInfo.InvariantCulture),
+            float f => f.ToString("G", CultureInfo.InvariantCulture),
+            decimal m => m.ToString("G", CultureInfo.InvariantCulture),
+            Enum e => e.ToString(),
+            AvaloniaList<string> list => string.Join(",", list),
+            IBrush brush => brush.ToString() ?? "Unknown",
+            IBinding binding => SerializeBinding(binding),
+            IResourceProvider => "DynamicResource",
+            ITemplate => "Template",
+            ILogical logical => logical.GetType().Name,
+            _ when value.GetType().IsValueType => value.ToString() ?? string.Empty,
+            _ => value.ToString() ?? string.Empty
+        };
     }
 
     /// <summary>
-    /// Преобразует привязку в строку (упрощённо).
+    /// Упрощённая сериализация привязки.
     /// </summary>
     private static string SerializeBinding(IBinding binding)
     {
@@ -109,38 +94,41 @@ public static class PropertySerializationHelper
     }
 
     /// <summary>
-    /// Определяет, какого типа значение (для ValueKind).
+    /// Определяет тип значения свойства.
     /// </summary>
     public static AvaloniaPropertyValueKind ResolveValueKind(object value)
     {
-        switch (value)
+        return value switch
         {
-            case Control:
-                return AvaloniaPropertyValueKind.Control;
+            Control control => control.GetLogicalChildren().Any()
+                ? AvaloniaPropertyValueKind.Logical
+                : AvaloniaPropertyValueKind.Control,
 
-            case ILogical logical:
-                return logical.LogicalChildren.Any()
-                    ? AvaloniaPropertyValueKind.Logical
-                    : AvaloniaPropertyValueKind.Simple;
+            ILogical logical => logical.GetLogicalChildren().Any()
+                ? AvaloniaPropertyValueKind.Logical
+                : AvaloniaPropertyValueKind.Simple,
 
-            case AvaloniaList<string>:
-                return AvaloniaPropertyValueKind.Complex;
+            AvaloniaList<string> => AvaloniaPropertyValueKind.Complex,
+            IBinding => AvaloniaPropertyValueKind.Binding,
+            ITemplate => AvaloniaPropertyValueKind.Template,
+            IResourceProvider => AvaloniaPropertyValueKind.Resource,
+            IBrush => AvaloniaPropertyValueKind.Brush,
 
-            case IBinding:
-                return AvaloniaPropertyValueKind.Binding;
+            _ => value.GetType() is { } type && (type.IsPrimitive || type.IsEnum || value is string || type.IsValueType)
+                ? AvaloniaPropertyValueKind.Simple
+                : AvaloniaPropertyValueKind.Unknown
+        };
+    }
 
-            case ITemplate:
-                return AvaloniaPropertyValueKind.Template;
-
-            case IResourceProvider:
-                return AvaloniaPropertyValueKind.Resource;
-
-            default:
-                var type = value.GetType();
-                if (type.IsPrimitive || type.IsEnum || value is string || type.IsValueType)
-                    return AvaloniaPropertyValueKind.Simple;
-
-                return AvaloniaPropertyValueKind.Unknown;
-        }
+    /// <summary>
+    /// Пытается построить сериализованное логическое дерево из значения.
+    /// </summary>
+    public static LogicalNode? TryBuildSerializedValue(object value)
+    {
+        return value switch
+        {
+            Control or ILogical or System.Collections.IEnumerable => LogicalTreeBuilder.BuildLogicalTreeFromObject(value),
+            _ => null
+        };
     }
 }

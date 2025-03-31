@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.LogicalTree;
 using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo.Models.Properties;
@@ -25,9 +24,8 @@ public class StyledAvaloniaPropertyModel : AvaloniaPropertyModel
         {
             Name = property.Name,
             Value = PropertySerializationHelper.SerializeValue(value),
-            ValueKind = PropertySerializationHelper.ResolveValueKind(value)
+            ValueKind = PropertySerializationHelper.ResolveValueKind(value),
+            SerializedValue = PropertySerializationHelper.TryBuildSerializedValue(value)
         };
     }
-
-    
 }

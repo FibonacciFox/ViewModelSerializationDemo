@@ -10,80 +10,91 @@ namespace ViewModelSerializationDemo
             LogicalNode logicalTree = LogicalTreeBuilder.BuildLogicalTree(new UserControl1());
 
             // Выводим логическое дерево в консоль для проверки.
-              PrintLogicalTree(logicalTree, 0);
+            PrintLogicalTree(logicalTree);
         }
 
         // Рекурсивный метод для вывода структуры логического дерева в консоль.
-        static void PrintLogicalTree(LogicalNode node, int indent)
-{
-    string indentStr = new string(' ', indent);
-
-    // 🔷 Контрол
-    Console.ForegroundColor = ConsoleColor.Cyan;
-    Console.WriteLine($"{indentStr}Control: {node.ElementType}");
-    Console.ResetColor();
-
-    // Метод для цветного вывода свойства
-    void PrintProperty(AvaloniaPropertyModel prop, string category)
-    {
-        // Выбор цвета по типу свойства
-        ConsoleColor color = category switch
+        static void PrintLogicalTree(LogicalNode node, string indent = "", bool isLast = true)
         {
-            "StyledProperty" => ConsoleColor.Yellow,
-            "AttachedProperty" => ConsoleColor.Magenta,
-            "DirectProperty" => ConsoleColor.Green,
-            "ClrProperty" => ConsoleColor.Blue,
-            _ => ConsoleColor.White
-        };
+            // └─ или ├─ перед узлом
+            string prefix = isLast ? "└─" : "├─";
 
-        Console.ForegroundColor = color;
-        Console.Write($"{indentStr}  {category}: ");
-        Console.ResetColor();
+            // 🔷 Заголовок: тип + имя (если есть)
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            if (node is ElementNode element && !string.IsNullOrWhiteSpace(element.Name))
+                Console.WriteLine($"{indent}{prefix} Element: {node.ElementType} (Name: {element.Name})");
+            else
+                Console.WriteLine($"{indent}{prefix} Element: {node.ElementType}");
+            Console.ResetColor();
 
-        Console.Write($"{prop.Name} = {prop.Value} ");
+            // 📐 Для последующих отступов
+            string childIndent = indent + (isLast ? "   " : "│  ");
 
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.Write($"(Kind: {prop.ValueKind}");
+            void PrintProperty(AvaloniaPropertyModel prop, string category)
+            {
+                ConsoleColor color = category switch
+                {
+                    "StyledProperty" => ConsoleColor.Yellow,
+                    "AttachedProperty" => ConsoleColor.Magenta,
+                    "DirectProperty" => ConsoleColor.Green,
+                    "ClrProperty" => ConsoleColor.Blue,
+                    _ => ConsoleColor.White
+                };
 
-        if (prop.IsContainsControl)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write(", ContainsControl: true");
+                Console.ForegroundColor = color;
+                Console.Write($"{childIndent}• {category}: ");
+                Console.ResetColor();
+
+                Console.Write($"{prop.Name} = {prop.Value} ");
+
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write($"(Kind: {prop.ValueKind}, Xaml: ");
+
+                Console.ForegroundColor = prop.CanBeSerializedToXaml ? ConsoleColor.Green : ConsoleColor.DarkRed;
+                Console.Write(prop.CanBeSerializedToXaml ? "serializable" : "not serializable");
+
+                if (prop.IsContainsControl)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(", ContainsControl: true");
+                }
+
+                if (prop.IsRuntimeOnly)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.Write(", RuntimeOnly: true");
+                }
+
+                Console.ResetColor();
+                Console.WriteLine(")");
+
+                // 🔽 Вывод вложенного логического дерева, если это не простое значение
+                if (prop.SerializedValue != null && prop.ValueKind != AvaloniaPropertyValueKind.Simple)
+                {
+                    PrintLogicalTree(prop.SerializedValue, childIndent, true);
+                }
+            }
+
+            // ⏬ Вывод свойств
+            foreach (var prop in node.StyledProperties)
+                PrintProperty(prop, "StyledProperty");
+
+            foreach (var prop in node.AttachedProperties)
+                PrintProperty(prop, "AttachedProperty");
+
+            foreach (var prop in node.DirectProperties)
+                PrintProperty(prop, "DirectProperty");
+
+            foreach (var prop in node.ClrProperties)
+                PrintProperty(prop, "ClrProperty");
+
+            
+            // 👶 Дочерние узлы
+            for (int i = 0; i < node.Children.Count; i++)
+            {
+                bool last = i == node.Children.Count - 1;
+                PrintLogicalTree(node.Children[i], childIndent, last);
+            }
         }
-
-        Console.ResetColor();
-        Console.WriteLine(")");
-    }
-
-    // Styled
-    foreach (var prop in node.StyledProperties)
-        PrintProperty(prop, "StyledProperty");
-
-    // Attached
-    foreach (var prop in node.AttachedProperties)
-        PrintProperty(prop, "AttachedProperty");
-
-    // Direct
-    foreach (var prop in node.DirectProperties)
-        PrintProperty(prop, "DirectProperty");
-
-    // CLR
-    foreach (var prop in node.ClrProperties)
-        PrintProperty(prop, "ClrProperty");
-
-    // Text node
-    if (node is TextNode textNode)
-    {
-        Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.WriteLine($"{indentStr}  Text: {textNode.Text}");
-        Console.ResetColor();
-    }
-
-    // Дочерние узлы
-    foreach (var child in node.Children)
-        PrintLogicalTree(child, indent + 2);
-}
-
-
     }
 }

@@ -22,8 +22,8 @@ public class DirectAvaloniaPropertyModel : AvaloniaPropertyModel
         {
             Name = property.Name,
             Value = PropertySerializationHelper.SerializeValue(value),
-            ValueKind = PropertySerializationHelper.ResolveValueKind(value)
+            ValueKind = PropertySerializationHelper.ResolveValueKind(value),
+            SerializedValue = PropertySerializationHelper.TryBuildSerializedValue(value)
         };
     }
-
 }

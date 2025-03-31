@@ -23,18 +23,10 @@ namespace ViewModelSerializationDemo.Models.Properties
             {
                 Name = $"{property.OwnerType.Name}.{property.Name}",
                 Value = PropertySerializationHelper.SerializeValue(value),
-                ValueKind = PropertySerializationHelper.ResolveValueKind(value)
+                ValueKind = PropertySerializationHelper.ResolveValueKind(value),
+                SerializedValue = PropertySerializationHelper.TryBuildSerializedValue(value)
             };
-
-            if (value is Control childControl)
-            {
-                node.SerializedValue = LogicalTreeBuilder.BuildLogicalTree(childControl);
-            }
-            else if (value is ILogical logical && logical.LogicalChildren.Any())
-            {
-                // Можно добавить сериализацию логических элементов, если нужно
-            }
-
+            
             return node;
         }
 

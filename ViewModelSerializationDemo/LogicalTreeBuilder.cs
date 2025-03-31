@@ -12,30 +12,22 @@ namespace ViewModelSerializationDemo
                 ElementType = control.GetType().Name,
             };
 
-            // Сериализуем все типы свойств (Styled, Attached, Direct, CLR)
+            // Сериализуем все типы свойств
             PropertySerializer.SerializeProperties(control, node);
 
-            // Обработка содержимого для ContentControl.
+            // Обрабатываем Content, если это ContentControl
             if (control is ContentControl contentControl)
             {
                 ProcessContent(contentControl.Content, node);
             }
-            // Если контрол не является ContentControl, обходим его LogicalChildren.
+            // Обрабатываем логическое дерево
             else if (control is ILogical logical)
             {
-                foreach (var child in logical.LogicalChildren)
+                foreach (var child in logical.GetLogicalChildren())
                 {
                     if (child is Control childControl)
                     {
                         node.Children.Add(BuildLogicalTree(childControl));
-                    }
-                    else
-                    {
-                        // node.Children.Add(new TextNode 
-                        // { 
-                        //     ElementType = child.GetType().Name, 
-                        //     Text = child.ToString() ?? "" 
-                        // });
                     }
                 }
             }
@@ -43,30 +35,94 @@ namespace ViewModelSerializationDemo
             return node;
         }
 
+        public static LogicalNode BuildLogicalTreeFromILogical(ILogical logical)
+        {
+            var node = new ElementNode
+            {
+                ElementType = logical.GetType().Name
+            };
+
+            foreach (var child in logical.GetLogicalChildren())
+            {
+                switch (child)
+                {
+                    case Control control:
+                        node.Children.Add(BuildLogicalTree(control));
+                        break;
+
+                    case ILogical sublogical:
+                        node.Children.Add(BuildLogicalTreeFromILogical(sublogical));
+                        break;
+
+                    default:
+                        node.Children.Add(new ElementNode
+                        {
+                            ElementType = child?.GetType().Name ?? "null"
+                        });
+                        break;
+                }
+            }
+
+            return node;
+        }
+
+
+        public static LogicalNode BuildLogicalTreeFromObject(object value)
+        {
+            return value switch
+            {
+                Control control => BuildLogicalTree(control),
+
+                ILogical logical => BuildLogicalTreeFromILogical(logical),
+
+                System.Collections.IEnumerable enumerable when value is not string =>
+                    new ElementNode
+                    {
+                        ElementType = value.GetType().Name,
+                        Children = enumerable
+                            .Cast<object>()
+                            .Select(BuildLogicalTreeFromObject)
+                            .Where(child => child is not null)
+                            .ToList()
+                    },
+
+                _ => new ElementNode
+                {
+                    ElementType = value.GetType().Name
+                }
+            };
+        }
+
         private static void ProcessContent(object? content, LogicalNode parentNode)
         {
             if (content == null)
                 return;
 
-            if (content is Control control)
+            switch (content)
             {
-                parentNode.Children.Add(BuildLogicalTree(control));
-            }
-            else if (content is System.Collections.IEnumerable enumerable && !(content is string))
-            {
-                foreach (var item in enumerable)
-                {
-                    ProcessContent(item, parentNode);
-                }
-            }
-            else
-            {
-                parentNode.Children.Add(new TextNode
-                {
-                    ElementType = content.GetType().Name,
-                    Text = content.ToString() ?? ""
-                });
+                case Control control:
+                    parentNode.Children.Add(BuildLogicalTree(control));
+                    break;
+
+                case ILogical logical:
+                    parentNode.Children.Add(BuildLogicalTreeFromILogical(logical));
+                    break;
+
+                case System.Collections.IEnumerable enumerable when content is not string:
+                    foreach (var item in enumerable)
+                    {
+                        ProcessContent(item, parentNode);
+                    }
+                    break;
+
+                default:
+                    parentNode.Children.Add(new ElementNode
+                    {
+                        ElementType = content.GetType().Name
+                    });
+                    break;
             }
         }
+
     }
 }

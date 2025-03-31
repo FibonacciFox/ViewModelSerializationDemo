@@ -47,7 +47,13 @@ public abstract class AvaloniaPropertyModel
     /// Можно ли сериализовать это свойство в axaml.
     /// </summary>
     public bool CanBeSerializedToXaml { get; private set; } = true;
-
+    
+    /// <summary>
+    /// Является ли свойство только для времени выполнения (например, ActualWidth).
+    /// Такие свойства не сериализуются и используются только для отображения.
+    /// </summary>
+    public bool IsRuntimeOnly { get; set; } = false;
+    
     /// <summary>
     /// Определяет, совместим ли тип значения с axaml (можно ли представить его как строку).
     /// </summary>
@@ -60,14 +66,5 @@ public abstract class AvaloniaPropertyModel
             AvaloniaPropertyValueKind.Resource => false,
             _ => true
         };
-    }
-
-    /// <summary>
-    /// Проверяет, является ли значение простым типом (string, number и т.п.).
-    /// </summary>
-    protected static bool IsSimpleValue(object value)
-    {
-        var type = value.GetType();
-        return type.IsPrimitive || type.IsEnum || value is string || value is double || value is float || value is decimal;
     }
 }
