@@ -108,12 +108,15 @@ public static class PropertySerializationHelper
                 ? AvaloniaPropertyValueKind.Logical
                 : AvaloniaPropertyValueKind.Simple,
 
+            AvaloniaList<string> list when value.GetType() == typeof(Classes) 
+                => AvaloniaPropertyValueKind.StyledClasses,
+
             AvaloniaList<string> => AvaloniaPropertyValueKind.Complex,
             IBinding => AvaloniaPropertyValueKind.Binding,
             ITemplate => AvaloniaPropertyValueKind.Template,
             IResourceProvider => AvaloniaPropertyValueKind.Resource,
             IBrush => AvaloniaPropertyValueKind.Brush,
-
+            
             _ => value.GetType() is { } type && (type.IsPrimitive || type.IsEnum || value is string || type.IsValueType)
                 ? AvaloniaPropertyValueKind.Simple
                 : AvaloniaPropertyValueKind.Unknown
@@ -127,8 +130,16 @@ public static class PropertySerializationHelper
     {
         return value switch
         {
-            Control or ILogical or System.Collections.IEnumerable => LogicalTreeBuilder.BuildLogicalTreeFromObject(value),
+            Control or ILogical => LogicalTreeBuilder.BuildLogicalTreeFromObject(value),
+
+            // Исключаем специфические коллекции, которые не имеют смысла сериализовать как дерево
+            System.Collections.IEnumerable enumerable
+                when value is not AvaloniaList<string>
+                    and not Classes
+                    and not IPseudoClasses => LogicalTreeBuilder.BuildLogicalTreeFromObject(value),
+
             _ => null
         };
     }
+
 }

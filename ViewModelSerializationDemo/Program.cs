@@ -9,30 +9,52 @@ namespace ViewModelSerializationDemo
             // Формируем логическое дерево из UserControl1.
             LogicalNode logicalTree = LogicalTreeBuilder.BuildLogicalTree(new UserControl1());
 
-            // Выводим логическое дерево в консоль для проверки.
+            // Выводим логическое дерево в консоль.
             PrintLogicalTree(logicalTree);
         }
 
-        // Рекурсивный метод для вывода структуры логического дерева в консоль.
         static void PrintLogicalTree(LogicalNode node, string indent = "", bool isLast = true)
         {
-            // └─ или ├─ перед узлом
             string prefix = isLast ? "└─" : "├─";
-
-            // 🔷 Заголовок: тип + имя (если есть)
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            if (node is ElementNode element && !string.IsNullOrWhiteSpace(element.Name))
-                Console.WriteLine($"{indent}{prefix} Element: {node.ElementType} (Name: {element.Name})");
-            else
-                Console.WriteLine($"{indent}{prefix} Element: {node.ElementType}");
-            Console.ResetColor();
-
-            // 📐 Для последующих отступов
             string childIndent = indent + (isLast ? "   " : "│  ");
 
+            // 🎨 Цвета для ValueKind
+            ConsoleColor GetKindColor(AvaloniaPropertyValueKind kind) => kind switch
+            {
+                AvaloniaPropertyValueKind.Control => ConsoleColor.Cyan,
+                AvaloniaPropertyValueKind.Logical => ConsoleColor.DarkCyan,
+                AvaloniaPropertyValueKind.StyledClasses => ConsoleColor.Magenta,
+                AvaloniaPropertyValueKind.Complex => ConsoleColor.DarkYellow,
+                AvaloniaPropertyValueKind.Brush => ConsoleColor.Green,
+                AvaloniaPropertyValueKind.Template => ConsoleColor.DarkGray,
+                AvaloniaPropertyValueKind.Binding => ConsoleColor.Blue,
+                AvaloniaPropertyValueKind.Resource => ConsoleColor.DarkGreen,
+                _ => ConsoleColor.Gray
+            };
+
+            // 🔷 Заголовок узла
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            var name = node is ElementNode el && !string.IsNullOrWhiteSpace(el.Name)
+                ? $"{el.DisplayName}"
+                : node.ElementType ?? "Unknown";
+            Console.Write($"{indent}{prefix} Element: {name}");
+
+            Console.ForegroundColor = GetKindColor(node.ValueKind);
+            Console.Write($" (Kind: {node.ValueKind})");
+
+            if (node.IsContainsControl)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write(" [HasChildControls]");
+            }
+
+            Console.ResetColor();
+            Console.WriteLine();
+
+            // Свойства
             void PrintProperty(AvaloniaPropertyModel prop, string category)
             {
-                ConsoleColor color = category switch
+                ConsoleColor catColor = category switch
                 {
                     "StyledProperty" => ConsoleColor.Yellow,
                     "AttachedProperty" => ConsoleColor.Magenta,
@@ -41,17 +63,21 @@ namespace ViewModelSerializationDemo
                     _ => ConsoleColor.White
                 };
 
-                Console.ForegroundColor = color;
+                Console.ForegroundColor = catColor;
                 Console.Write($"{childIndent}• {category}: ");
                 Console.ResetColor();
 
                 Console.Write($"{prop.Name} = {prop.Value} ");
 
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write($"(Kind: {prop.ValueKind}, Xaml: ");
+                Console.Write("(Kind: ");
+                Console.ForegroundColor = GetKindColor(prop.ValueKind);
+                Console.Write($"{prop.ValueKind}");
+                Console.ResetColor();
 
+                Console.Write(", Xaml: ");
                 Console.ForegroundColor = prop.CanBeSerializedToXaml ? ConsoleColor.Green : ConsoleColor.DarkRed;
-                Console.Write(prop.CanBeSerializedToXaml ? "serializable" : "not serializable");
+                Console.Write(prop.CanBeSerializedToXaml ? "yes" : "no");
 
                 if (prop.IsContainsControl)
                 {
@@ -68,14 +94,11 @@ namespace ViewModelSerializationDemo
                 Console.ResetColor();
                 Console.WriteLine(")");
 
-                // 🔽 Вывод вложенного логического дерева, если это не простое значение
+                // 🔽 Вложенные значения
                 if (prop.SerializedValue != null && prop.ValueKind != AvaloniaPropertyValueKind.Simple)
-                {
                     PrintLogicalTree(prop.SerializedValue, childIndent, true);
-                }
             }
 
-            // ⏬ Вывод свойств
             foreach (var prop in node.StyledProperties)
                 PrintProperty(prop, "StyledProperty");
 
@@ -88,8 +111,7 @@ namespace ViewModelSerializationDemo
             foreach (var prop in node.ClrProperties)
                 PrintProperty(prop, "ClrProperty");
 
-            
-            // 👶 Дочерние узлы
+            // 👶 Дочерние элементы
             for (int i = 0; i < node.Children.Count; i++)
             {
                 bool last = i == node.Children.Count - 1;

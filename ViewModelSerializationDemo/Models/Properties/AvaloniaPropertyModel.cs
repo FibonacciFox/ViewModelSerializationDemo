@@ -1,3 +1,6 @@
+using Avalonia.Controls;
+using Avalonia.Controls.Documents;
+
 namespace ViewModelSerializationDemo.Models.Properties;
 
 /// <summary>
@@ -35,7 +38,10 @@ public abstract class AvaloniaPropertyModel
     /// <summary>
     /// Возвращает true, если значение представляет собой Control или ILogical-объект с деревом.
     /// </summary>
-    public bool IsContainsControl => SerializedValue != null;
+    public bool IsContainsControl =>
+        SerializedValue is ElementNode el &&
+        el.ElementType is not (nameof(Classes) or nameof(InlineCollection) or nameof(RowDefinitions) or nameof(ColumnDefinitions)) &&
+        el.Children.Count > 0;
 
     /// <summary>
     /// Если значение свойства является логическим деревом (например, Control),

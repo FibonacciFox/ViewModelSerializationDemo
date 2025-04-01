@@ -44,6 +44,12 @@ public enum AvaloniaPropertyValueKind
     /// Значение является кистью (Background, BorderBrush, Foreground, ...).
     /// </summary>
     Brush,
+    
+    /// <summary>
+    /// Значение является классом стилизованного элемента.
+    /// </summary>
+    StyledClasses,
+
 
     /// <summary>
     /// Неопределённый или нестандартный тип.

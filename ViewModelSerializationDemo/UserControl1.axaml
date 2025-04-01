@@ -7,6 +7,5 @@
              Background="Gold"
              Name="UserControl2"
              x:Class="ViewModelSerializationDemo.UserControl1">
-    <ListBox Name="ListBox1" SelectionMode="Multiple,Toggle" >
-    </ListBox>
+    
 </UserControl>
