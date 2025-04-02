@@ -7,15 +7,15 @@
              Background="Gold"
              Name="UserControl2"
              x:Class="ViewModelSerializationDemo.UserControl1">
-    
-    <Rectangle Name="Rectangle1" Fill="Aqua" Height="200" Width="400"
-               Classes="Test,h1"
-               ToolTip.Placement="Bottom">
-        <ToolTip.Tip>
-            <StackPanel>
-                <TextBlock Name="TextBlockH1" Classes="h1,h2,h3" FontSize="16">Rectangle</TextBlock>
-                <Button Content="Test"/>
-            </StackPanel>
-        </ToolTip.Tip>
-    </Rectangle>
+    <Expander VerticalAlignment="Top">
+        <Expander.Header>
+            <Button Content="HEADER BUTTON"></Button>
+        </Expander.Header>
+        <Grid RowDefinitions="*,*" ColumnDefinitions="150,*">
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Search</TextBlock>
+            <TextBox Grid.Row="0" Grid.Column="1" Watermark="Search text" Width="200" />
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Case sensitive?</TextBlock>
+            <CheckBox Grid.Row="1" Grid.Column="1" />
+        </Grid>
+    </Expander>
 </UserControl>

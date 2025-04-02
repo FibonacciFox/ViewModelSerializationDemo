@@ -21,9 +21,4 @@ public class ElementNode : LogicalNode
         string.IsNullOrWhiteSpace(Name)
             ? ElementType ?? "Unknown"
             : $"{ElementType} (Name: {Name})";
-
-    public ElementNode()
-    {
-        ValueKind = AvaloniaValueKind.Control;
-    }
 }

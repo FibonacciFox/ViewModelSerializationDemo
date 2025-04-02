@@ -99,29 +99,37 @@ public static class PropertySerializationHelper
     {
         return value switch
         {
-            Control control => control.GetLogicalChildren().Any()
-                ? AvaloniaValueKind.Logical
-                : AvaloniaValueKind.Control,
+            Control => AvaloniaValueKind.Control,
 
             ILogical logical => logical.GetLogicalChildren().Any()
                 ? AvaloniaValueKind.Logical
                 : AvaloniaValueKind.Simple,
 
-            AvaloniaList<string> when value.GetType() == typeof(Classes) 
+            AvaloniaList<string> when value.GetType().Name == "Classes" 
                 => AvaloniaValueKind.StyledClasses,
 
             AvaloniaList<string> => AvaloniaValueKind.Complex,
+
+            // Привязки
             IBinding => AvaloniaValueKind.Binding,
+
+            // Шаблоны
             ITemplate => AvaloniaValueKind.Template,
+
+            // Ресурсы
             IResourceProvider => AvaloniaValueKind.Resource,
+
+            // Кисти
             IBrush => AvaloniaValueKind.Brush,
-            
-            _ => value.GetType() is { } type && (type.IsPrimitive || type.IsEnum || value is string || type.IsValueType)
+
+            // Простые типы
+            _ => value.GetType() is { } type &&
+                 (type.IsPrimitive || type.IsEnum || value is string || type.IsValueType)
                 ? AvaloniaValueKind.Simple
                 : AvaloniaValueKind.Unknown
         };
     }
-
+    
     /// <summary>
     /// Пытается построить сериализованное логическое дерево из значения.
     /// </summary>
@@ -139,5 +147,6 @@ public static class PropertySerializationHelper
             _ => null
         };
     }
+
 
 }

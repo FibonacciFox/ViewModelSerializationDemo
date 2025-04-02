@@ -5,4 +5,11 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AxamlSerializationDemo.MainWindow"
         Title="AxamlSerializationDemo">
+        
+                <Grid RowDefinitions="*, 4, *">
+                        <Rectangle Grid.Row="0" Fill="Blue"/>
+                        <GridSplitter Grid.Row="1" Background="Black" ResizeDirection="Rows"/>
+                        <Rectangle Grid.Row="2" Fill="Red"/>
+                </Grid>  
+
 </Window>

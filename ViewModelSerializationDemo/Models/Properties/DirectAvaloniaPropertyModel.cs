@@ -9,8 +9,19 @@ namespace ViewModelSerializationDemo.Models.Properties;
 /// </summary>
 public class DirectAvaloniaPropertyModel : AvaloniaPropertyModel
 {
+    /// <summary>
+    /// Явно исключаемые свойства, даже если они валидные CLR.
+    /// </summary>
+    private static readonly HashSet<string> ExcludedDirectProperties = new()
+    {
+        "Inlines","SelectedItems","Selection"
+    };
+    
     public static DirectAvaloniaPropertyModel? From(AvaloniaProperty property, Control control)
     {
+        if (ExcludedDirectProperties.Contains(property.Name))
+            return null;
+        
         if (property.IsReadOnly)
             return null;
 

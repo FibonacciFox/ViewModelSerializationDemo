@@ -1,5 +1,7 @@
+using System.Collections;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo
 {
@@ -10,36 +12,36 @@ namespace ViewModelSerializationDemo
             var node = new ElementNode
             {
                 ElementType = control.GetType().Name,
+                OriginalInstance = control,
+                ValueKind = PropertySerializationHelper.ResolveValueKind(control)
             };
 
-            // Сериализуем все типы свойств
             PropertySerializer.SerializeProperties(control, node);
 
-            // Обрабатываем Content, если это ContentControl
             if (control is ContentControl contentControl)
             {
                 ProcessContent(contentControl.Content, node);
             }
-            // Обрабатываем логическое дерево
             else if (control is ILogical logical)
             {
                 foreach (var child in logical.GetLogicalChildren())
                 {
                     if (child is Control childControl)
-                    {
                         node.Children.Add(BuildLogicalTree(childControl));
-                    }
                 }
             }
 
             return node;
         }
 
+
         public static LogicalNode BuildLogicalTreeFromILogical(ILogical logical)
         {
             var node = new ElementNode
             {
-                ElementType = logical.GetType().Name
+                ElementType = logical.GetType().Name,
+                OriginalInstance = logical,
+                ValueKind = PropertySerializationHelper.ResolveValueKind(logical)
             };
 
             foreach (var child in logical.GetLogicalChildren())
@@ -57,7 +59,9 @@ namespace ViewModelSerializationDemo
                     default:
                         node.Children.Add(new ElementNode
                         {
-                            ElementType = child.GetType().Name
+                            ElementType = child.GetType().Name ?? "null",
+                            ValueKind = AvaloniaValueKind.Unknown,
+                            OriginalInstance = child
                         });
                         break;
                 }
@@ -65,20 +69,21 @@ namespace ViewModelSerializationDemo
 
             return node;
         }
-
+        
 
         public static LogicalNode BuildLogicalTreeFromObject(object value)
         {
             return value switch
             {
                 Control control => BuildLogicalTree(control),
-
                 ILogical logical => BuildLogicalTreeFromILogical(logical),
 
-                System.Collections.IEnumerable enumerable when value is not string =>
+                IEnumerable enumerable when value is not string =>
                     new ElementNode
                     {
                         ElementType = value.GetType().Name,
+                        ValueKind = PropertySerializationHelper.ResolveValueKind(value),
+                        OriginalInstance = value,
                         Children = enumerable
                             .Cast<object>()
                             .Select(BuildLogicalTreeFromObject)
@@ -88,41 +93,41 @@ namespace ViewModelSerializationDemo
 
                 _ => new ElementNode
                 {
-                    ElementType = value.GetType().Name
+                    ElementType = value.GetType().Name,
+                    ValueKind = PropertySerializationHelper.ResolveValueKind(value),
+                    OriginalInstance = value
                 }
             };
         }
 
+
         private static void ProcessContent(object? content, LogicalNode parentNode)
         {
-            if (content == null)
-                return;
-
             switch (content)
             {
+                case null:
+                    return;
                 case Control control:
                     parentNode.Children.Add(BuildLogicalTree(control));
                     break;
-
                 case ILogical logical:
                     parentNode.Children.Add(BuildLogicalTreeFromILogical(logical));
                     break;
-
-                case System.Collections.IEnumerable enumerable when content is not string:
+                case IEnumerable enumerable when content is not string:
                     foreach (var item in enumerable)
-                    {
                         ProcessContent(item, parentNode);
-                    }
                     break;
-
                 default:
                     parentNode.Children.Add(new ElementNode
                     {
-                        ElementType = content.GetType().Name
+                        ElementType = content.GetType().Name,
+                        ValueKind = PropertySerializationHelper.ResolveValueKind(content),
+                        OriginalInstance = content
                     });
                     break;
             }
         }
+
 
     }
 }

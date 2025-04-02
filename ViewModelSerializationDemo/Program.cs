@@ -12,6 +12,10 @@ namespace ViewModelSerializationDemo
 
             // Выводим логическое дерево в консоль.
             PrintLogicalTree(logicalTree);
+            
+            
+            Console.WriteLine("\n--- AXAML ---\n");
+            Console.WriteLine(AxamlGenerator.GenerateAxaml(logicalTree));
         }
 
         static void PrintLogicalTree(LogicalNode node, string indent = "", bool isLast = true)

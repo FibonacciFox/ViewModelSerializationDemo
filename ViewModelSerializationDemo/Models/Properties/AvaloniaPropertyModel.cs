@@ -19,7 +19,7 @@ public abstract class AvaloniaPropertyModel
     /// Используется для простых значений.
     /// </summary>
     public string? Value { get; set; }
-
+    
     private readonly AvaloniaValueKind _valueKind = AvaloniaValueKind.Unknown;
 
     /// <summary>
