@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ActiproVersion>25.1.1</ActiproVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia" Version="$(ActiproVersion)" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Bars.Mvvm" Version="$(ActiproVersion)" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Themes.ColorPicker" Version="$(ActiproVersion)" />
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Themes.DataGrid" Version="$(ActiproVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.5"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.5">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>

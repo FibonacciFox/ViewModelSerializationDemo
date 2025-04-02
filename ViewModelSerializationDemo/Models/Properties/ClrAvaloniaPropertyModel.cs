@@ -1,49 +1,92 @@
+using System;
+using System.Collections.Generic;
 using System.Reflection;
+using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
-using ViewModelSerializationDemo.Helpers;
 
-namespace ViewModelSerializationDemo.Models.Properties;
-
-/// <summary>
-/// Узел для обычных CLR-свойств.
-/// </summary>
-public class ClrAvaloniaPropertyModel : AvaloniaPropertyModel
+namespace ViewModelSerializationDemo.Models.Properties
 {
-    private static readonly HashSet<string> ExcludedProperties = new()
+    /// <summary>
+    /// Узел для обычных CLR-свойств.
+    /// </summary>
+    public class ClrAvaloniaPropertyModel : AvaloniaPropertyModel
     {
-        "DefiningGeometry",
-        "RenderedGeometry",
-        "Resources"
-    };
-
-    public static ClrAvaloniaPropertyModel? From(PropertyInfo prop, Control control)
-    {
-        if (ExcludedProperties.Contains(prop.Name))
-            return null;
-
-        bool isRuntimeOnly = PropertySerializationHelper.IsRuntimeProperty(prop);
-
-        if (!PropertySerializationHelper.IsXamlSerializableClrProperty(prop, control))
-            return null;
-
-        try
+        /// <summary>
+        /// Явно исключаемые свойства, даже если они валидные CLR.
+        /// </summary>
+        private static readonly HashSet<string> ExcludedProperties = new()
         {
-            var value = prop.GetValue(control);
-            if (value == null)
+            "DefiningGeometry",
+            "RenderedGeometry",
+            "Resources"
+        };
+
+        public static ClrAvaloniaPropertyModel? From(PropertyInfo prop, Control control)
+        {
+            if (ExcludedProperties.Contains(prop.Name))
                 return null;
 
-            return new ClrAvaloniaPropertyModel
+            if (!IsXamlAssignableProperty(prop, control))
+                return null;
+
+            try
             {
-                Name = prop.Name,
-                Value = PropertySerializationHelper.SerializeValue(value),
-                ValueKind = PropertySerializationHelper.ResolveValueKind(value),
-                IsRuntimeOnly = isRuntimeOnly,
-                SerializedValue = PropertySerializationHelper.TryBuildSerializedValue(value)
-            };
+                var value = prop.GetValue(control);
+                if (value == null)
+                    return null;
+
+                var stringValue = SerializeValue(value);
+                if (string.IsNullOrWhiteSpace(stringValue))
+                    return null;
+
+                return new ClrAvaloniaPropertyModel
+                {
+                    Name = prop.Name,
+                    Value = stringValue
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
-        catch
+
+        private static bool IsXamlAssignableProperty(PropertyInfo prop, Control control)
         {
-            return null;
+            if (!prop.CanRead || prop.GetIndexParameters().Length > 0 || prop.GetMethod?.IsPublic != true)
+                return false;
+
+            var fieldName = prop.Name + "Property";
+            var fieldInfo = control.GetType().GetField(fieldName,
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            if (fieldInfo != null && typeof(AvaloniaProperty).IsAssignableFrom(fieldInfo.FieldType))
+                return false;
+
+            if (prop.SetMethod?.IsPublic == true)
+                return true;
+
+            var type = prop.PropertyType;
+
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string))
+                return false;
+
+            var parseMethod = type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static,
+                null, new[] { typeof(string) }, null);
+
+            return parseMethod != null;
+        }
+
+        /// <summary>
+        /// Обрабатывает сериализацию значений особых типов (например, Classes).
+        /// </summary>
+        private static string SerializeValue(object value)
+        {
+            // Обработка всех AvaloniaList<string> (например: Classes, PseudoClasses и т.п.)
+            if (value is AvaloniaList<string> stringList)
+                return string.Join(",", stringList);
+
+            return value.ToString() ?? string.Empty;
         }
     }
 }
