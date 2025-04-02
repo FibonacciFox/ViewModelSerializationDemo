@@ -1,4 +1,4 @@
-using ViewModelSerializationDemo.Models.Properties;
+using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo;
 
@@ -24,6 +24,6 @@ public class ElementNode : LogicalNode
 
     public ElementNode()
     {
-        ValueKind = AvaloniaPropertyValueKind.Control;
+        ValueKind = AvaloniaValueKind.Control;
     }
 }

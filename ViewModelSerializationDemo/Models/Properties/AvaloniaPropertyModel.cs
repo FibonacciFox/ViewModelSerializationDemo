@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
+using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo.Models.Properties;
 
@@ -19,16 +20,16 @@ public abstract class AvaloniaPropertyModel
     /// </summary>
     public string? Value { get; set; }
 
-    private AvaloniaPropertyValueKind _valueKind = AvaloniaPropertyValueKind.Unknown;
+    private readonly AvaloniaValueKind _valueKind = AvaloniaValueKind.Unknown;
 
     /// <summary>
     /// Категория значения свойства (простое, Control, логическое и т.п.).
     /// Устанавливая это значение, автоматически обновляется CanBeSerializedToXaml.
     /// </summary>
-    public AvaloniaPropertyValueKind ValueKind
+    public AvaloniaValueKind ValueKind
     {
         get => _valueKind;
-        set
+        protected init
         {
             _valueKind = value;
             CanBeSerializedToXaml = IsXamlCompatible(value);
@@ -58,18 +59,18 @@ public abstract class AvaloniaPropertyModel
     /// Является ли свойство только для времени выполнения (например, ActualWidth).
     /// Такие свойства не сериализуются и используются только для отображения.
     /// </summary>
-    public bool IsRuntimeOnly { get; set; } = false;
+    public bool IsRuntimeOnly { get; set; }
     
     /// <summary>
     /// Определяет, совместим ли тип значения с axaml (можно ли представить его как строку).
     /// </summary>
-    private static bool IsXamlCompatible(AvaloniaPropertyValueKind kind)
+    private static bool IsXamlCompatible(AvaloniaValueKind kind)
     {
         return kind switch
         {
-            AvaloniaPropertyValueKind.Binding => false,
-            AvaloniaPropertyValueKind.Template => false,
-            AvaloniaPropertyValueKind.Resource => false,
+            AvaloniaValueKind.Binding => false,
+            AvaloniaValueKind.Template => false,
+            AvaloniaValueKind.Resource => false,
             _ => true
         };
     }

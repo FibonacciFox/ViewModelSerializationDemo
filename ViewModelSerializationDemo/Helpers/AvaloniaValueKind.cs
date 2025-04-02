@@ -1,9 +1,9 @@
-namespace ViewModelSerializationDemo.Models.Properties;
+namespace ViewModelSerializationDemo.Helpers;
 
 /// <summary>
 /// Определяет, какого типа значение свойства Avalonia.
 /// </summary>
-public enum AvaloniaPropertyValueKind
+public enum AvaloniaValueKind
 {
     /// <summary>
     /// Простое значение: строка, число, логическое значение и т.п.

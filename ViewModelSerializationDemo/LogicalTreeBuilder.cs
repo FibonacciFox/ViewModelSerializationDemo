@@ -50,14 +50,14 @@ namespace ViewModelSerializationDemo
                         node.Children.Add(BuildLogicalTree(control));
                         break;
 
-                    case ILogical sublogical:
+                    case { } sublogical:
                         node.Children.Add(BuildLogicalTreeFromILogical(sublogical));
                         break;
 
                     default:
                         node.Children.Add(new ElementNode
                         {
-                            ElementType = child?.GetType().Name ?? "null"
+                            ElementType = child.GetType().Name
                         });
                         break;
                 }
@@ -82,7 +82,7 @@ namespace ViewModelSerializationDemo
                         Children = enumerable
                             .Cast<object>()
                             .Select(BuildLogicalTreeFromObject)
-                            .Where(child => child is not null)
+                            .Where(_ => true)
                             .ToList()
                     },
 

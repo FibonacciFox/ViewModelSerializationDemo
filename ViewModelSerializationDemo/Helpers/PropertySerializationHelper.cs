@@ -7,7 +7,6 @@ using Avalonia.Data;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Styling;
-using ViewModelSerializationDemo.Models.Properties;
 
 namespace ViewModelSerializationDemo.Helpers;
 
@@ -96,30 +95,30 @@ public static class PropertySerializationHelper
     /// <summary>
     /// Определяет тип значения свойства.
     /// </summary>
-    public static AvaloniaPropertyValueKind ResolveValueKind(object value)
+    public static AvaloniaValueKind ResolveValueKind(object value)
     {
         return value switch
         {
             Control control => control.GetLogicalChildren().Any()
-                ? AvaloniaPropertyValueKind.Logical
-                : AvaloniaPropertyValueKind.Control,
+                ? AvaloniaValueKind.Logical
+                : AvaloniaValueKind.Control,
 
             ILogical logical => logical.GetLogicalChildren().Any()
-                ? AvaloniaPropertyValueKind.Logical
-                : AvaloniaPropertyValueKind.Simple,
+                ? AvaloniaValueKind.Logical
+                : AvaloniaValueKind.Simple,
 
-            AvaloniaList<string> list when value.GetType() == typeof(Classes) 
-                => AvaloniaPropertyValueKind.StyledClasses,
+            AvaloniaList<string> when value.GetType() == typeof(Classes) 
+                => AvaloniaValueKind.StyledClasses,
 
-            AvaloniaList<string> => AvaloniaPropertyValueKind.Complex,
-            IBinding => AvaloniaPropertyValueKind.Binding,
-            ITemplate => AvaloniaPropertyValueKind.Template,
-            IResourceProvider => AvaloniaPropertyValueKind.Resource,
-            IBrush => AvaloniaPropertyValueKind.Brush,
+            AvaloniaList<string> => AvaloniaValueKind.Complex,
+            IBinding => AvaloniaValueKind.Binding,
+            ITemplate => AvaloniaValueKind.Template,
+            IResourceProvider => AvaloniaValueKind.Resource,
+            IBrush => AvaloniaValueKind.Brush,
             
             _ => value.GetType() is { } type && (type.IsPrimitive || type.IsEnum || value is string || type.IsValueType)
-                ? AvaloniaPropertyValueKind.Simple
-                : AvaloniaPropertyValueKind.Unknown
+                ? AvaloniaValueKind.Simple
+                : AvaloniaValueKind.Unknown
         };
     }
 
@@ -133,8 +132,7 @@ public static class PropertySerializationHelper
             Control or ILogical => LogicalTreeBuilder.BuildLogicalTreeFromObject(value),
 
             // Исключаем специфические коллекции, которые не имеют смысла сериализовать как дерево
-            System.Collections.IEnumerable enumerable
-                when value is not AvaloniaList<string>
+            System.Collections.IEnumerable when value is not AvaloniaList<string>
                     and not Classes
                     and not IPseudoClasses => LogicalTreeBuilder.BuildLogicalTreeFromObject(value),
 

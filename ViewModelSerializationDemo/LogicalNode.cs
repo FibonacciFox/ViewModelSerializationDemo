@@ -1,3 +1,4 @@
+using ViewModelSerializationDemo.Helpers;
 using ViewModelSerializationDemo.Models.Properties;
 
 namespace ViewModelSerializationDemo;
@@ -18,9 +19,9 @@ public abstract class LogicalNode
     public object? OriginalInstance { get; set; }
 
     /// <summary>
-    /// Категория значения для самого узла (Control, Logical, Text и т.п.).
+    /// Категория значения для самого узла (Control, Logical и т.п.).
     /// </summary>
-    public AvaloniaPropertyValueKind ValueKind { get; set; } = AvaloniaPropertyValueKind.Unknown;
+    public AvaloniaValueKind ValueKind { get; set; } = AvaloniaValueKind.Unknown;
 
     /// <summary>
     /// Свойства типа Styled.
@@ -46,12 +47,7 @@ public abstract class LogicalNode
     /// Дочерние узлы (если элемент является контейнером).
     /// </summary>
     public List<LogicalNode> Children { get; set; } = new();
-
-    /// <summary>
-    /// Есть ли дочерние узлы.
-    /// </summary>
-    public bool HasChildren => Children.Count > 0;
-
+    
     /// <summary>
     /// Содержит ли хотя бы один дочерний Control (ElementNode).
     /// </summary>

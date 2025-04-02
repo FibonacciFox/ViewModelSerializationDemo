@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.LogicalTree;
 using ViewModelSerializationDemo.Helpers;
 
 namespace ViewModelSerializationDemo.Models.Properties

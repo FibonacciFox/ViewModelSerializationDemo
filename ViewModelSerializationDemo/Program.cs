@@ -1,4 +1,5 @@
-﻿using ViewModelSerializationDemo.Models.Properties;
+﻿using ViewModelSerializationDemo.Helpers;
+using ViewModelSerializationDemo.Models.Properties;
 
 namespace ViewModelSerializationDemo
 {
@@ -15,20 +16,20 @@ namespace ViewModelSerializationDemo
 
         static void PrintLogicalTree(LogicalNode node, string indent = "", bool isLast = true)
         {
-            string prefix = isLast ? "└─" : "├─";
+            string prefix = isLast ? "\u2514" : "\u251c";
             string childIndent = indent + (isLast ? "   " : "│  ");
 
             // 🎨 Цвета для ValueKind
-            ConsoleColor GetKindColor(AvaloniaPropertyValueKind kind) => kind switch
+            ConsoleColor GetKindColor(AvaloniaValueKind kind) => kind switch
             {
-                AvaloniaPropertyValueKind.Control => ConsoleColor.Cyan,
-                AvaloniaPropertyValueKind.Logical => ConsoleColor.DarkCyan,
-                AvaloniaPropertyValueKind.StyledClasses => ConsoleColor.Magenta,
-                AvaloniaPropertyValueKind.Complex => ConsoleColor.DarkYellow,
-                AvaloniaPropertyValueKind.Brush => ConsoleColor.Green,
-                AvaloniaPropertyValueKind.Template => ConsoleColor.DarkGray,
-                AvaloniaPropertyValueKind.Binding => ConsoleColor.Blue,
-                AvaloniaPropertyValueKind.Resource => ConsoleColor.DarkGreen,
+                AvaloniaValueKind.Control => ConsoleColor.Cyan,
+                AvaloniaValueKind.Logical => ConsoleColor.DarkCyan,
+                AvaloniaValueKind.StyledClasses => ConsoleColor.Magenta,
+                AvaloniaValueKind.Complex => ConsoleColor.DarkYellow,
+                AvaloniaValueKind.Brush => ConsoleColor.Green,
+                AvaloniaValueKind.Template => ConsoleColor.DarkGray,
+                AvaloniaValueKind.Binding => ConsoleColor.Blue,
+                AvaloniaValueKind.Resource => ConsoleColor.DarkGreen,
                 _ => ConsoleColor.Gray
             };
 
@@ -64,7 +65,7 @@ namespace ViewModelSerializationDemo
                 };
 
                 Console.ForegroundColor = catColor;
-                Console.Write($"{childIndent}• {category}: ");
+                Console.Write($"{childIndent} \u25a0 {category}: ");
                 Console.ResetColor();
 
                 Console.Write($"{prop.Name} = {prop.Value} ");
@@ -95,7 +96,7 @@ namespace ViewModelSerializationDemo
                 Console.WriteLine(")");
 
                 // 🔽 Вложенные значения
-                if (prop.SerializedValue != null && prop.ValueKind != AvaloniaPropertyValueKind.Simple)
+                if (prop.SerializedValue != null && prop.ValueKind != AvaloniaValueKind.Simple)
                     PrintLogicalTree(prop.SerializedValue, childIndent, true);
             }
 
